@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: path/to/your/dist/folder
+          path: lib
 
   publish-github:
     needs: build
@@ -47,7 +47,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dist
-          path: path/to/your/dist/folder
+          path: lib
 
       # Setup Node.js environment for publishing to GitHub Packages
       - name: Setup Node.js
@@ -75,7 +75,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dist
-          path: path/to/your/dist/folder
+          path: lib
 
       # Setup Node.js environment for publishing to npm
       - name: Setup Node.js
