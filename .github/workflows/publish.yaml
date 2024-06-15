@@ -27,26 +27,27 @@ jobs:
       # Compile TypeScript (adjust paths and options as needed)
       - name: Compile TypeScript
         run: npm run build  # Adjust this command based on your project's build script
-      
+  publish-github:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       # Publish to GitHub Packages
       - name: Publish to GitHub Packages
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Setup Node.js environment for npm
-      - name: Setup Node.js for npm
-        uses: actions/setup-node@v4
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
-          registry-url: 'https://registry.npmjs.org'  # Switch to npm registry
-          scope: '@checkfirst'  # npm organization scope
-
-      # Configure npm authentication
-      - name: Configure npm registry authentication
-        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-
-      # Publish to npm
-      - name: Publish to npm
-        run: npm publish --access public
-
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
