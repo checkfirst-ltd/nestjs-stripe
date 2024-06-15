@@ -1,4 +1,5 @@
-name: Publish package to GitHub Packages
+name: Publish Package to GitHub Packages and npm
+
 on:
   release:
     types: [published]
@@ -10,15 +11,14 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-      # Setup Node.js environment
+      # Setup Node.js environment for building
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '14' # Adjust the Node.js version as per your project requirements
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@checkfirst-ltd' # Ensure correct scope for your package
+          node-version: '14'
       
       # Install dependencies
       - name: Install dependencies
@@ -26,11 +26,37 @@ jobs:
       
       # Compile TypeScript (adjust paths and options as needed)
       - name: Compile TypeScript
-        run: npm run build  # Adjust this command based on your project's build script
+        run: npm run build
+
+      # Store build artifacts in the workspace
+      - name: Archive production files
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: path/to/your/dist/folder
+
   publish-github:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      # Retrieve build artifacts from workspace
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: path/to/your/dist/folder
+
+      # Setup Node.js environment for publishing to GitHub Packages
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@checkfirst-ltd'  # GitHub organization scope
+      
       # Publish to GitHub Packages
       - name: Publish to GitHub Packages
         run: npm publish --access public
@@ -41,13 +67,30 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      # Retrieve build artifacts from workspace
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          name: dist
+          path: path/to/your/dist/folder
 
+      # Setup Node.js environment for publishing to npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          registry-url: 'https://registry.npmjs.org/'
+          scope: '@checkfirst'  # npm organization scope
+      
+      # Install dependencies
+      - name: Install dependencies
+        run: npm ci
+      
+      # Publish to npm
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
