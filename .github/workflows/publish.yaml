@@ -33,13 +33,20 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Setup npm for npmjs.org
-      - name: Setup npm for npmjs.org
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+        # Setup Node.js environment for npm
+      - name: Setup Node.js for npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+          registry-url: 'https://registry.npmjs.org'  # Switch to npm registry
+          scope: '@checkfirst'  # npm organization scope
+
+      # Configure npm authentication
+      - name: Configure npm registry authentication
+        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
 
       # Publish to npm
       - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
+
 
