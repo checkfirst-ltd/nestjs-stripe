@@ -77,6 +77,11 @@ jobs:
           name: dist
           path: lib
 
+      # Modify package.json for npm publishing
+      - name: Modify package.json for npm
+        run: |
+          sed -i 's/"name": "@checkfirst-ltd\/nestjs-stripe"/"name": "@checkfirst\/nestjs-stripe"/' package.json
+
       # Setup Node.js environment for publishing to npm
       - name: Setup Node.js
         uses: actions/setup-node@v3
