@@ -1,6 +1,6 @@
 {
   "name": "@checkfirst-ltd/nestjs-stripe",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Provides an injectable Stripe client to nestjs modules",
   "repository": {
     "type": "git",
